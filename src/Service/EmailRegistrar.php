@@ -11,8 +11,11 @@ namespace Soil\NonFrictionalRegistration\Service;
 use Doctrine\ORM\EntityManager;
 use Soil\NonFrictionalRegistration\Service\Exception\UserAlreadyExists;
 use Talaka\ContactConfirmationComponent\Service\CodeIssuer;
+use Zend\Crypt\Password\Bcrypt;
 use Zend\Form\Element\Email;
+use Zend\Math\Rand;
 use ZfcUser\Entity\UserInterface;
+use ZfcUser\Options\UserServiceOptionsInterface;
 
 class EmailRegistrar {
 
@@ -20,6 +23,8 @@ class EmailRegistrar {
     const USER_STATE_NON_COMPLETE = 2;
 
     protected $userEntityClass = 'User\Entity\User';
+
+    protected $zfcUserOptions;
 
     /**
      * @var EntityManager
@@ -67,14 +72,29 @@ class EmailRegistrar {
             $user->setState(self::USER_STATE_NON_COMPLETE);
 
             $this->em->persist($user);
-            $this->em->flush();
         }
 
-        $this->codeIssuer->issue($user->getId(), 'email', $email);
+        //generate new password
+        $password = bin2hex(openssl_random_pseudo_bytes(4));
+
+        $bcrypt = new Bcrypt();
+        $bcrypt->setCost($this->getZfcUserOptions()->getPasswordCost());
+        $user->setPassword($bcrypt->create($password));
+
+        $this->em->flush();
+
+        $this->codeIssuer->issue($user->getId(), 'email', $email, 'default', [
+            'email' => $user->getEmail(),
+            'password' => $password
+        ]);
 
         return true;
 
 
+    }
+
+    public function confirmRequest($hash)    {
+        return true;
     }
 
 
@@ -93,6 +113,23 @@ class EmailRegistrar {
     {
         $this->codeIssuer = $codeIssuer;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getZfcUserOptions()
+    {
+        return $this->zfcUserOptions;
+    }
+
+    /**
+     * @param mixed $zfcUserOptions
+     */
+    public function setZfcUserOptions($zfcUserOptions)
+    {
+        $this->zfcUserOptions = $zfcUserOptions;
+    }
+
 
 
 

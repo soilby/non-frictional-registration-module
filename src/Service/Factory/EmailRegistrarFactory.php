@@ -20,6 +20,9 @@ class EmailRegistrarFactory implements FactoryInterface {
         $registrar->setEm($serviceLocator->get('entity_manager'));
         $registrar->setCodeIssuer($serviceLocator->get('SoilNonFrictionalCodeIssuerService'));
 
+        $options = $serviceLocator->get('zfcuser_module_options');
+        $registrar->setZfcUserOptions($options);
+
         return $registrar;
     }
 

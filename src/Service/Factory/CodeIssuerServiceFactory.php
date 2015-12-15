@@ -18,10 +18,13 @@ class CodeIssuerServiceFactory extends ConconCodeIssuerServiceFactory implements
 
 
     protected function getRepository()  {
+        $repo = $this->getDM()->getRepository($this->persistentEntityClass);
+
         $classMetadata = $this->getDM()->getClassMetadata($this->persistentEntityClass);
         $classMetadata->setCollection('nf_registration');
 
-        return $this->getDM()->getRepository($this->persistentEntityClass);
+        return $repo;
+
     }
 
     protected function factoryRenderer($for)    {
