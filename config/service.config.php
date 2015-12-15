@@ -4,7 +4,10 @@ return array(
     'service_manager' => [
         'alias' => [],
         'invokables' => [],
-        'factories' => []
+        'factories' => [
+            'SoilNonFrictionalRegistrar' => 'Soil\NonFrictionalRegistration\Service\Factory\EmailRegistrarFactory',
+            'SoilNonFrictionalCodeIssuerService' => 'Soil\NonFrictionalRegistration\Service\Factory\CodeIssuerServiceFactory'
+        ]
     ],
     'controllers' => [
         'invokables' => []
@@ -12,7 +15,6 @@ return array(
     'view_helpers' => [
         'invokables' => [],
         'factories' => [
-            'soilOnSiteNotificationWidget' => 'Soil\OnSiteNotificationClient\View\Helper\NotificationEngineFactory'
         ]
     ]
 
