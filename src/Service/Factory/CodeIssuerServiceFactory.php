@@ -27,6 +27,17 @@ class CodeIssuerServiceFactory extends ConconCodeIssuerServiceFactory implements
 
     }
 
+
+    protected function getModuleConfig()  {
+        $config = parent::getModuleConfig();
+        if (!array_key_exists('settings', $config)) {
+            $config['settings'] = [];
+        }
+        $config['settings']['mail_subject'] = "Добро пожаловать на Talaka.by!";
+
+        return $config;
+    }
+
     protected function factoryRenderer($for)    {
         switch ($for) {
             case 'email':

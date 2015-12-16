@@ -11,6 +11,7 @@ namespace Soil\NonFrictionalRegistration\Service;
 use Doctrine\ORM\EntityManager;
 use Soil\NonFrictionalRegistration\Service\Exception\UserAlreadyExists;
 use Talaka\ContactConfirmationComponent\Service\CodeIssuer;
+use Talaka\ContactConfirmationComponent\Service\Confirmation;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Form\Element\Email;
 use Zend\Math\Rand;
@@ -35,6 +36,11 @@ class EmailRegistrar {
      * @var CodeIssuer
      */
     protected $codeIssuer;
+
+    /**
+     * @var Confirmation
+     */
+    protected $codeConfirmationService;
 
 
 
@@ -94,7 +100,7 @@ class EmailRegistrar {
     }
 
     public function confirmRequest($hash)    {
-        return true;
+        return $this->codeConfirmationService->confirm($hash, 'email');
     }
 
 
@@ -113,6 +119,16 @@ class EmailRegistrar {
     {
         $this->codeIssuer = $codeIssuer;
     }
+
+    /**
+     * @param mixed $codeConfirmationService
+     */
+    public function setCodeConfirmationService($codeConfirmationService)
+    {
+        $this->codeConfirmationService = $codeConfirmationService;
+    }
+
+
 
     /**
      * @return mixed
