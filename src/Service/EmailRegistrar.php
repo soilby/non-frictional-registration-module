@@ -100,7 +100,11 @@ class EmailRegistrar {
     }
 
     public function confirmRequest($hash)    {
-        return $this->codeConfirmationService->confirm($hash, 'email');
+        $entry = $this->codeConfirmationService->confirm($hash, 'email');
+
+
+
+        return $entry;
     }
 
 

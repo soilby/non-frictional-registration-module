@@ -18,13 +18,6 @@ return array(
         )
     ), // doctrine
 
-    'view_manager' => array(
-        'template_path_stack' => array(
-            __DIR__ . '/../view',
-        ),
-    ),
     'front_end_config' => [
-        'on_site_notification' => [
-        ]
     ]
 );
