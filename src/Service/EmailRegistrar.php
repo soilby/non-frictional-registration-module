@@ -21,7 +21,8 @@ use ZfcUser\Options\UserServiceOptionsInterface;
 class EmailRegistrar {
 
     const USER_STATE_ACTIVE = 1;
-    const USER_STATE_NON_COMPLETE = 2;
+    const USER_STATE_CONFIRMED_NOT_COMPLETE = 2;
+    const USER_STATE_NOT_CONFIRMED_NOT_COMPLETE = 3;
 
     protected $userEntityClass = 'User\Entity\User';
 
@@ -61,21 +62,24 @@ class EmailRegistrar {
     public function newUser($email)   {
 
         $element = new Email('email');
-        $isValid = $element->getEmailValidator()->isValid($email);
+        if (!$element->getEmailValidator()->isValid($email))    {
+            throw new \Exception("Invalid email");
+        }
+
 
         $user = $this->getRepository()->findOneBy([
             'email' => $email
         ]);
 
         if ($user) {
-            if ($user->getState() !== self::USER_STATE_NON_COMPLETE) {
+            if ($user->getState() !== self::USER_STATE_NOT_CONFIRMED_NOT_COMPLETE) {
                 throw new UserAlreadyExists("User with provided email already exists");
             }
         }
         else    {
             $user = $this->factoryUser();
             $user->setEmail($email);
-            $user->setState(self::USER_STATE_NON_COMPLETE);
+            $user->setState(self::USER_STATE_NOT_CONFIRMED_NOT_COMPLETE);
 
             $this->em->persist($user);
         }
