@@ -44,7 +44,7 @@ class CodeIssuerServiceFactory extends ConconCodeIssuerServiceFactory implements
                 return new Letter(
                     $this->getRenderEngine(),
                     'user/non-frictional-registration/mail-template',
-                    'user/non-frictional-registration/mail-template'
+                    'user/non-frictional-registration/mail-template-extended'
                 );
 
             default:

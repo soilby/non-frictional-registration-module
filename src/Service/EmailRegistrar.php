@@ -13,12 +13,15 @@ use Soil\NonFrictionalRegistration\Service\Exception\UserAlreadyExists;
 use Talaka\ContactConfirmationComponent\Service\CodeIssuer;
 use Talaka\ContactConfirmationComponent\Service\Confirmation;
 use Zend\Crypt\Password\Bcrypt;
+use Zend\EventManager\EventManagerAwareTrait;
 use Zend\Form\Element\Email;
 use Zend\Math\Rand;
 use ZfcUser\Entity\UserInterface;
 use ZfcUser\Options\UserServiceOptionsInterface;
 
 class EmailRegistrar {
+
+    use EventManagerAwareTrait;
 
     const USER_STATE_ACTIVE = 1;
     const USER_STATE_CONFIRMED_NOT_COMPLETE = 2;
@@ -59,6 +62,18 @@ class EmailRegistrar {
         return new $this->userEntityClass;
     }
 
+
+    public function createPassword() {
+        return bin2hex(openssl_random_pseudo_bytes(4));
+    }
+
+    public function getPasswordHash($password)  {
+        $bcrypt = new Bcrypt();
+        $bcrypt->setCost($this->getZfcUserOptions()->getPasswordCost());
+
+        return $bcrypt->create($password);
+    }
+
     public function newUser($email)   {
 
         $element = new Email('email');
@@ -85,21 +100,31 @@ class EmailRegistrar {
         }
 
         //generate new password
-        $password = bin2hex(openssl_random_pseudo_bytes(4));
+        $password = $this->createPassword();
+        $passwordHash = $this->getPasswordHash($password);
 
-        $bcrypt = new Bcrypt();
-        $bcrypt->setCost($this->getZfcUserOptions()->getPasswordCost());
-        $user->setPassword($bcrypt->create($password));
+        $user->setPassword($passwordHash);
 
         $this->em->flush();
 
-        $this->codeIssuer->issue($user->getId(), 'email', $email, 'default', [
-            'email' => $user->getEmail(),
-            'password' => $password
+//        $this->codeIssuer->issue($user->getId(), 'email', $email, 'default', [
+//            'email' => $user->getEmail(),
+//            'password' => $password
+//        ]);
+        $this->issueCode($user, $password);
+
+        $this->getEventManager()->trigger('register.post', $this, [
+            'user' => $user
         ]);
 
         return true;
+    }
 
+    public function issueCode($user, $plainPassword)    {
+        return $this->codeIssuer->issue($user->getId(), 'email', $user->getEmail(), 'extended', [
+            'email' => $user->getEmail(),
+            'password' => $plainPassword
+        ]);
 
     }
 
