@@ -112,7 +112,7 @@ class EmailRegistrar {
 //            'password' => $password
 //        ]);
         $this->issueCode($user, $password);
-
+        
         $this->getEventManager()->trigger('register.post', $this, [
             'user' => $user
         ]);

@@ -33,8 +33,10 @@ class CodeIssuerServiceFactory extends ConconCodeIssuerServiceFactory implements
         if (!array_key_exists('settings', $config)) {
             $config['settings'] = [];
         }
-        $config['settings']['mail_subject'] = "Добро пожаловать на Talaka.by!";
+        $config['settings']['mail_subject'] = "Добро пожаловать на Talaka!";
 
+        $config['settings']['from_email'] = "=?UTF-8?B?" . base64_encode('Talaka Регистрация') . "?=".' <poshta@talaka.by>';
+        
         return $config;
     }
 
@@ -43,7 +45,7 @@ class CodeIssuerServiceFactory extends ConconCodeIssuerServiceFactory implements
             case 'email':
                 return new Letter(
                     $this->getRenderEngine(),
-                    'user/non-frictional-registration/mail-template',
+                    'user/non-frictional-registration/mail-template-extended',
                     'user/non-frictional-registration/mail-template-extended'
                 );
 
