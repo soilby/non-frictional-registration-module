@@ -107,6 +107,8 @@ class EmailRegistrar {
 
         $this->em->flush();
 
+        //$curl = curl_init($this->container->getParameter('client_domain').'/user/settings/change-access-options-from-api');
+
 //        $this->codeIssuer->issue($user->getId(), 'email', $email, 'default', [
 //            'email' => $user->getEmail(),
 //            'password' => $password
@@ -117,7 +119,7 @@ class EmailRegistrar {
             'user' => $user
         ]);
 
-        return true;
+        return $user->getId();
     }
 
     public function issueCode($user, $plainPassword)    {
